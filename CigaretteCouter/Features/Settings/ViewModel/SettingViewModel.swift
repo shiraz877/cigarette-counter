@@ -1,109 +1,162 @@
-//
-//  SettingViewModel.swift
-//  CigaretteCouter
-//
-//  Created by Shiraz on 18/08/26.
-//
+////////
+////////  SettingViewModel.swift
+////////  CigaretteCouter
+////////
+////////  Created by Shiraz on 18/08/26.
+////////
 
-
-
-import SwiftUI
+import Foundation
 import Observation
 
-@MainActor
 @Observable
+@MainActor
 final class SettingsViewModel {
-
-    private let dailyAverageKey = "dailyAverage"
-    private let cigarettesPerPackKey = "cigarettesPerPack"
-    private let packPriceKey = "packPrice"
-    private let defaultTriggerKey = "defaultTrigger"
-    private let dailyReminderKey = "dailyReminder"
-    private let eveningSummaryKey = "eveningSummary"
-
-    var dailyAverage: Int {
-        didSet {
-            UserDefaults.standard.set(
-                dailyAverage,
-                forKey: dailyAverageKey
-            )
-        }
+    
+    @ObservationIgnored
+    private let settingsRepository: SettingsRepositoryProtocol
+    
+    var settings = UserSettingModel()
+    
+    var isLoading = false
+    var errorMessage: String?
+    
+    init(
+        settingsRepository: SettingsRepositoryProtocol = SettingsRepository()
+    ) {
+        self.settingsRepository = settingsRepository
     }
-
-    var cigarettesPerPack: Int {
-        didSet {
-            UserDefaults.standard.set(
-                cigarettesPerPack,
-                forKey: cigarettesPerPackKey
-            )
-        }
+    
+    var dailyGoal: Int {
+        settings.dailyGoal
     }
-
-    var packPrice: String {
-        didSet {
-            UserDefaults.standard.set(
-                packPrice,
-                forKey: packPriceKey
-            )
-        }
+    
+   
+    var cigarettePrice: String {
+        let rupees = Double(settings.cigarettePricePaise) / 100
+        return "₹\(Int(rupees))"
     }
-
+    
     var defaultTrigger: String {
-        didSet {
-            UserDefaults.standard.set(
-                defaultTrigger,
-                forKey: defaultTriggerKey
-            )
-        }
+        settings.defaultTrigger?.title ?? "None"
     }
-
+    
     var dailyReminder: Bool {
-        didSet {
-            UserDefaults.standard.set(
-                dailyReminder,
-                forKey: dailyReminderKey
-            )
-        }
+        settings.dailyReminderEnabled
     }
-
+    
     var eveningSummary: Bool {
-        didSet {
-            UserDefaults.standard.set(
-                eveningSummary,
-                forKey: eveningSummaryKey
-            )
+        settings.eveningSummaryEnabled
+    }
+    
+    
+    
+    
+    
+    func loadSettings() async {
+        
+        do {
+            settings = try await settingsRepository.getSettings()
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
-
-    init() {
-        self.dailyAverage =
-            UserDefaults.standard.object(
-                forKey: dailyAverageKey
-            ) as? Int ?? 0
-
-        self.cigarettesPerPack =
-            UserDefaults.standard.object(
-                forKey: cigarettesPerPackKey
-            ) as? Int ?? 0
-
-        self.packPrice =
-            UserDefaults.standard.string(
-                forKey: packPriceKey
-            ) ?? ""
-
-        self.defaultTrigger =
-            UserDefaults.standard.string(
-                forKey: defaultTriggerKey
-            ) ?? ""
-
-        self.dailyReminder =
-            UserDefaults.standard.object(
-                forKey: dailyReminderKey
-            ) as? Bool ?? false
-
-        self.eveningSummary =
-            UserDefaults.standard.object(
-                forKey: eveningSummaryKey
-            ) as? Bool ?? false
+    
+    func updateDailyGoal(_ value: Int) async {
+        
+        settings.dailyGoal = value
+        
+        await saveSettings()
     }
+    
+    //    func updateCigarettesPerPack(_ value: Int) async {
+    //
+    //        settings.cigarettesPerPack = value
+    //
+    //        await saveSettings()
+    //    }
+    
+    //    func updatePackPrice(_ paise: Int) async {
+    //
+    //        settings.packPricePaise = paise
+    //
+    //        await saveSettings()
+    //    }
+    func updateCigarettePrice(_ paise: Int) async {
+        
+        settings.cigarettePricePaise = paise
+        
+        await saveSettings()
+    }
+    
+    func updateDefaultTrigger(
+        _ trigger: CigaretteTriggerModel?
+    ) async {
+        
+        settings.defaultTrigger = trigger
+        
+        await saveSettings()
+    }
+    
+    func toggleDailyReminder() async {
+        
+        settings.dailyReminderEnabled.toggle()
+        
+        await saveSettings()
+    }
+    
+    func toggleEveningSummary() async {
+        
+        settings.eveningSummaryEnabled.toggle()
+        
+        await saveSettings()
+    }
+    
+    func deleteAll() async  {
+        do {
+            
+            try await settingsRepository.deleteAllHistory()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    
+    func exportData() {
+        print("Export data")
+    }
+    
+ 
+    
+    func openPrivacyPolicy() {
+        print("Privacy policy")
+    }
+    
+    func openTerms() {
+        print("Terms of service")
+    }
+    
+    func rateApp() {
+        print("Rate app")
+    }
+    
+    func shareApp() {
+        print("Share app")
+    }
+    
+    func openSupport() {
+        print("Support")
+    }
+    
+    
+    
+    
+    private func saveSettings() async {
+        
+        do {
+            try await settingsRepository.saveSettings(settings)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
 }

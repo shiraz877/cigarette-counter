@@ -6,3 +6,27 @@
 //
 
 import Foundation
+
+
+struct CigaretteModel: Identifiable, Codable, Hashable {
+    
+    let id: String
+    let smokedAt: Date
+    let createdAt: Date
+    let trigger: CigaretteTriggerModel?
+    
+    init(
+        id: String = UUID().uuidString,
+        smokedAt: Date = Date(),
+        createdAt: Date = Date(),
+        trigger: CigaretteTriggerModel? = nil,
+        
+    ) {
+        self.id = id
+        self.smokedAt = smokedAt
+        self.createdAt = createdAt
+        self.trigger = trigger
+        
+    }
+}
+

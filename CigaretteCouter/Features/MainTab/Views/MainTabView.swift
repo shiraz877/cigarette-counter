@@ -5,34 +5,29 @@
 //  Created by Shiraz on 18/08/26.
 //
 
-
-
 import SwiftUI
-
-
-// MARK: - Main Tab View
 
 @MainActor
 struct MainTabView: View {
-    
+
     @Environment(AppViewModel.self)
     private var appViewModel
-    
 
-    
+    @State private var showAccountSheet = false
+
     var body: some View {
+
         @Bindable var appViewModel = appViewModel
-        
-        VStack{
-            
+
+        VStack {
+
             topAppBar
-            
-            Divider().overlay(AppColors.primaryColor)
-            
-            Spacer()
-            
+
+            Divider()
+                .overlay(AppColors.primaryColor)
+
             TabView(selection: $appViewModel.selectedTab) {
-                
+
                 Tab(
                     AppViewModel.MainTab.home.title,
                     systemImage: AppViewModel.MainTab.home.iconName,
@@ -40,7 +35,7 @@ struct MainTabView: View {
                 ) {
                     HomeView()
                 }
-                
+
                 Tab(
                     AppViewModel.MainTab.analytics.title,
                     systemImage: AppViewModel.MainTab.analytics.iconName,
@@ -48,7 +43,7 @@ struct MainTabView: View {
                 ) {
                     AnalyticsView()
                 }
-                
+
                 Tab(
                     AppViewModel.MainTab.settings.title,
                     systemImage: AppViewModel.MainTab.settings.iconName,
@@ -58,50 +53,46 @@ struct MainTabView: View {
                 }
             }
             .tint(AppColors.primaryColor)
-            
         }
         .mainBackgroundColor()
-        
-    }
-}
-private var topAppBar: some View {
-    HStack {
-        Button(action: {}) {
-            Image(systemName: "line.3.horizontal")
-                .font(.system(size: 20))
-                .foregroundColor(.white)
-        }
-        
-        Spacer()
-        
-        Text("INVENTORY")
-            .font(.system(size: 20, weight: .black))
-            .tracking(1.0)
-            .foregroundColor(.white)
-        
-        Spacer()
-        
-        Button(action: {}) {
-            Image(systemName: "person.circle")
-                .font(.system(size: 22))
-                .foregroundColor(.white)
+        .sheet(isPresented: $showAccountSheet) {
+            AccountView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
-    .padding(AppTheme.standardPadding)
-    
-    
+
+    private var topAppBar: some View {
+
+        HStack {
+
+            Text("PUFF COUNTER")
+                .font(
+                    .system(
+                        size: 20,
+                        weight: .black
+                    )
+                )
+                .tracking(1.0)
+                .foregroundStyle(
+                    AppColors.primaryColor
+                )
+
+            Spacer()
+
+            Button {
+                showAccountSheet = true
+            } label: {
+                Image(systemName: "person.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(AppColors.primaryColor)
+            }
+        }
+        .padding(AppTheme.standardPadding)
+    }
 }
 
-
-#Preview {
-    MainTabView()
-        .environment(AppViewModel())
-}
-
-
-
-
-
-
- 
-
+//#Preview {
+//    MainTabView()
+//        .environment(AppViewModel())
+//}

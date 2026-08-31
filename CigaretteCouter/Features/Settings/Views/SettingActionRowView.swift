@@ -7,12 +7,43 @@
 
 import SwiftUI
 
-struct SettingActionRowView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+struct SettingsActionRowView: View {
 
-#Preview {
-    SettingActionRowView()
+    let title: LocalizedStringKey
+    let icon: String
+    var isDestructive = false
+
+    let action: () -> Void
+
+    var body: some View {
+
+        Button(action: action) {
+
+            HStack {
+
+                Text(title)
+                    .font(.system(size: 16))
+                    .foregroundStyle(
+                        isDestructive
+                        ? Color(hex: "#FFB4AB")
+
+                        : AppColors.primaryColor
+                    )
+
+                Spacer()
+
+                Image(systemName: icon)
+                    .font(.system(size: 19, weight: .light))
+                    .foregroundStyle(
+                        isDestructive
+                        ? Color(hex: "#FFB4AB")
+                        : AppColors.tertiaryColor
+                    )
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
 }

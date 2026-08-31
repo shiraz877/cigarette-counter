@@ -2,21 +2,23 @@
 import SwiftUI
 
 struct AccountView: View {
-
+    
     @Environment(\.dismiss)
     private var dismiss
-
+    
     @Environment(AppViewModel.self)
     private var appViewModel
-
+    
     @State private var emailAuthMode: EmailAuthView.Mode?
-
+    @State private var viewModel =
+    AccountViewModel()
+    
     var body: some View {
-
+        
         NavigationStack {
-
+            
             Group {
-
+                
                 if appViewModel.isAuthenticated {
                     loggedInView
                 } else {
@@ -24,18 +26,11 @@ struct AccountView: View {
                 }
             }
             .mainBackgroundColor()
-//            .toolbar {
-//
-//                ToolbarItem(
-//                    placement: .topBarTrailing
-//                ) {
-//                    closeButton
-//                }
-//            }
+            
             .navigationDestination(
                 item: $emailAuthMode
             ) { mode in
-
+                
                 EmailAuthView(
                     mode: mode
                 )
@@ -43,24 +38,25 @@ struct AccountView: View {
         }
         .preferredColorScheme(.dark)
     }
-
+    
     // MARK: - Guest View
-
+    
     private var guestView: some View {
-
+        
         ScrollView(
             showsIndicators: false
         ) {
-
+            
             VStack(spacing: 28) {
-
+                
                 // MARK: Header
-
+                
                 VStack(spacing: 12) {
-
+                    
                     accountIcon
-
-                    Text("Create your account")
+                    
+                    //                    Text("Create your account")
+                    Text("account.create_title")
                         .font(
                             .system(
                                 size: 28,
@@ -68,7 +64,7 @@ struct AccountView: View {
                             )
                         )
                         .foregroundStyle(.white)
-
+                    
                     Text(
                         "Sync your cigarette history and settings across your devices."
                     )
@@ -79,42 +75,42 @@ struct AccountView: View {
                     .multilineTextAlignment(.center)
                     .lineSpacing(3)
                 }
-
+                
                 // MARK: Account Options
-
+                
                 VStack(spacing: 12) {
-
+                    
                     AccountButton(
                         title: "Continue with Apple",
                         style: .apple
                     ) {
                         signInWithApple()
                     }
-
+                    
                     AccountButton(
                         title: "Continue with Google",
                         style: .google
                     ) {
                         signInWithGoogle()
                     }
-
+                    
                     AccountButton(
                         title: "Continue with Email",
                         style: .email
                     ) {
-
+                        
                         emailAuthMode = .signUp
                     }
                 }
-
+                
                 // MARK: Privacy
-
+                
                 Text(
                     "By continuing, you agree to our Terms of Service and Privacy Policy."
                 )
                 .font(.system(size: 12))
                 .foregroundStyle(
-                    AppColors.neutralColor
+                    AppColors.tertiaryColor
                 )
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
@@ -124,23 +120,23 @@ struct AccountView: View {
             .padding(.bottom, 40)
         }
     }
-
+    
     // MARK: - Logged In View
-
+    
     private var loggedInView: some View {
-
+        
         ScrollView(
             showsIndicators: false
         ) {
-
+            
             VStack(spacing: 24) {
-
+                
                 // MARK: Profile Header
-
+                
                 VStack(spacing: 12) {
-
+                    
                     accountIcon
-
+                    
                     Text(
                         appViewModel.currentUserName ?? "User"
                     )
@@ -151,10 +147,10 @@ struct AccountView: View {
                         )
                     )
                     .foregroundStyle(.white)
-
+                    
                     if let email =
                         appViewModel.currentUserEmail {
-
+                        
                         Text(email)
                             .font(.system(size: 14))
                             .foregroundStyle(
@@ -162,13 +158,13 @@ struct AccountView: View {
                             )
                     }
                 }
-
+                
                 // MARK: Sync Status
-
+                
                 VStack(spacing: 0) {
-
+                    
                     HStack(spacing: 14) {
-
+                        
                         Image(
                             systemName: "icloud.fill"
                         )
@@ -176,12 +172,12 @@ struct AccountView: View {
                         .foregroundStyle(
                             AppColors.primaryColor
                         )
-
+                        
                         VStack(
                             alignment: .leading,
                             spacing: 4
                         ) {
-
+                            
                             Text("Data synced")
                                 .font(
                                     .system(
@@ -190,7 +186,7 @@ struct AccountView: View {
                                     )
                                 )
                                 .foregroundStyle(.white)
-
+                            
                             Text(
                                 "Your cigarette history is synced."
                             )
@@ -199,9 +195,9 @@ struct AccountView: View {
                                 AppColors.neutralColor
                             )
                         }
-
+                        
                         Spacer()
-
+                        
                         Image(
                             systemName:
                                 "checkmark.circle.fill"
@@ -220,44 +216,47 @@ struct AccountView: View {
                         cornerRadius: 16
                     )
                 )
-
+                
                 // MARK: Account Actions
-
+                
                 VStack(spacing: 0) {
-
-                    accountRow(
-                        icon: "person",
-                        title: "Account Settings"
-                    ) {
-
-                        print("Account Settings")
-                    }
-
+                    
+                    //                    accountRow(
+                    //                        icon: "person",
+                    //                        title: "Account Settings"
+                    //                    ) {
+                    //
+                    //                        print("Account Settings")
+                    //
+                    //
+                    //                    }
+                    accountNavigationRow( icon: "person", title: "Account Settings" ) { SettingsView() }
+                    
                     Divider()
                         .overlay(
                             Color.white.opacity(0.08)
                         )
-
+                    
                     accountRow(
                         icon: "arrow.clockwise",
                         title: "Sync Data"
                     ) {
-
+                        
                         print("Sync Data")
                     }
-
+                    
                     Divider()
                         .overlay(
                             Color.white.opacity(0.08)
                         )
-
+                    
                     accountRow(
                         icon:
                             "rectangle.portrait.and.arrow.right",
                         title: "Log Out",
                         isDestructive: true
                     ) {
-
+                        
                         logOut()
                     }
                 }
@@ -275,13 +274,13 @@ struct AccountView: View {
             .padding(.bottom, 40)
         }
     }
-
+    
     // MARK: - Account Icon
-
+    
     private var accountIcon: some View {
-
+        
         ZStack {
-
+            
             Circle()
                 .fill(
                     AppColors.primaryColor
@@ -291,7 +290,7 @@ struct AccountView: View {
                     width: 72,
                     height: 72
                 )
-
+            
             Image(
                 systemName: "person.fill"
             )
@@ -306,22 +305,22 @@ struct AccountView: View {
             )
         }
     }
-
+    
     // MARK: - Account Row
-
+    
     private func accountRow(
         icon: String,
         title: String,
         isDestructive: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
-
+        
         Button(
             action: action
         ) {
-
+            
             HStack(spacing: 14) {
-
+                
                 Image(systemName: icon)
                     .font(.system(size: 18))
                     .foregroundStyle(
@@ -330,7 +329,7 @@ struct AccountView: View {
                         : AppColors.primaryColor
                     )
                     .frame(width: 24)
-
+                
                 Text(title)
                     .font(
                         .system(
@@ -343,11 +342,11 @@ struct AccountView: View {
                         ? .red
                         : .white
                     )
-
+                
                 Spacer()
-
+                
                 if !isDestructive {
-
+                    
                     Image(
                         systemName: "chevron.right"
                     )
@@ -361,17 +360,17 @@ struct AccountView: View {
         }
         .buttonStyle(.plain)
     }
-
+    
     // MARK: - Close Button
-
+    
     private var closeButton: some View {
-
+        
         Button {
-
+            
             dismiss()
-
+            
         } label: {
-
+            
             Image(
                 systemName: "xmark"
             )
@@ -394,23 +393,81 @@ struct AccountView: View {
             .clipShape(Circle())
         }
     }
-
+    
     // MARK: - Actions
-
+    
+//    private func signInWithApple() {
+//        
+//        print("Apple login")
+//    }
     private func signInWithApple() {
+        Task {
+            guard let user = await viewModel.signInWithApple()
+            else {
+                return
+            }
 
-        print("Apple login")
+            appViewModel.setAuthenticatedUser(user)
+        }
     }
-
+    
+    //    private func signInWithGoogle() {
+    //
+    ////        print("Google login")
+    //        Task {
+    //             await viewModel.signInWithGoogle()
+    //         }
+    //    }
     private func signInWithGoogle() {
-
-        print("Google login")
+        
+        Task {
+            
+            guard let user =
+                    await viewModel.signInWithGoogle()
+            else {
+                return
+            }
+            
+            appViewModel.setAuthenticatedUser(user)
+        }
     }
-
+    
     private func logOut() {
-
-        appViewModel.isAuthenticated = false
-        appViewModel.currentUserName = nil
-        appViewModel.currentUserEmail = nil
+        Task {
+            await appViewModel.signOut()
+        }
     }
+    private func accountNavigationRow<Destination: View>(
+        icon: String,
+        title: String,
+        @ViewBuilder destination: () -> Destination
+    ) -> some View {
+        NavigationLink {
+            destination()
+        } label: {
+            HStack(spacing: 14){
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundStyle(AppColors.primaryColor)
+                    .frame(width: 24)
+                
+                Text(title)
+                    .font(
+                        .system( size: 15,
+                                 weight: .medium
+                               )
+                    )
+                    .foregroundStyle(.white)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12))
+                    .foregroundStyle(AppColors.neutralColor)
+            }
+            .padding(16)
+        }
+        .buttonStyle(.plain)
+    }
+    
 }

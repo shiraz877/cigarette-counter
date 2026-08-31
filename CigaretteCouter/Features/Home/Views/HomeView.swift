@@ -1,395 +1,538 @@
 import SwiftUI
 
-struct ContentView1: View {
-
-    @State private var selectedTab: Tab = .home
-    @State private var cigaretteCount = 7
-
+@MainActor
+struct HomeView: View {
+    
+    @State private var viewModel = HomeViewModel()
+    @State private var showAllCigarettes = false
+    
     var body: some View {
-        ZStack(alignment: .bottom) {
-
-            Color.background
-                .ignoresSafeArea()
-
+        
+        VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-
-                    // MARK: - Header
-                    header
-
-                    // MARK: - Today
+                VStack(alignment: .leading, spacing: 32) {
+                    
                     Text("TODAY")
-                        .font(.system(size: 12, weight: .semibold))
-                        .tracking(1.5)
-                        .foregroundStyle(Color.secondaryText)
-                        .padding(.top, 32)
-
-                    // MARK: - Counter
-                    counterSection
-                        .padding(.top, 32)
-
-                    // MARK: - Stats
-                    statsSection
-                        .padding(.vertical, 32)
-
-                    // MARK: - Primary Action
-                    countButton
-                        .padding(.bottom, 32)
-
-                    // MARK: - Timeline
-                    timeline
-                        .padding(.bottom, 100)
+                        .font(.system(size: 12, weight: .bold))
+                        .tracking(2.0)
+                        .foregroundColor(AppColors.tertiaryColor)
+                        .padding(.top, 24)
+                    
+                    cigaretteCount
+                    
+                    Divider().background(AppColors.tertiaryColor)
+                    
+                    cigaretteSummary
+                   
+                    Divider().background(AppColors.tertiaryColor)
+                  
+                    PrimaryButton(title: viewModel.isRecording
+                        ? "Recording..."
+                        : "Count Cigarette",
+                        iconName: "plus"
+                    ) {
+                        
+                        Task {
+                            await viewModel.recordCigarette()
+                        }
+                    }
+                    .disabled(
+                        viewModel.isRecording
+                    )
+                    
+                    timeLine
                 }
-                .padding(.horizontal, 24)
-                .frame(maxWidth: 672)
-                .frame(maxWidth: .infinity)
-            }
-
-            // MARK: - Bottom Navigation
-            bottomNavigation
-        }
-        .preferredColorScheme(.dark)
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack {
-            Button {
-                // Menu action
-            } label: {
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: 22, weight: .light))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
-            }
-
-            Spacer()
-
-            Text("INVENTORY")
-                .font(.system(size: 28, weight: .bold))
-                .tracking(-0.8)
-                .foregroundStyle(.white)
-
-            Spacer()
-
-            Button {
-                // Profile action
-            } label: {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 24, weight: .light))
-                    .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
+                .padding(
+                    AppTheme.standardPadding
+                )
             }
         }
-        .padding(.vertical, 16)
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
+        .mainBackgroundColor()
+        .task {
+            
+            await viewModel.loadCigarettes()
+        }
+        .alert(
+            "Something went wrong",
+            isPresented: Binding(
+                get: {
+                    viewModel.errorMessage != nil
+                },
+                set: { isPresented in
+                    
+                    if !isPresented {
+                        viewModel.clearError()
+                    }
+                }
+            )
+        ) {
+            
+            Button("OK") {
+                viewModel.clearError()
+            }
+            
+        } message: {
+            
+            Text(
+                viewModel.errorMessage ?? ""
+            )
         }
     }
+    
 
-    // MARK: - Counter
+    private var lastCigaretteValue: String {
+        guard let latestCigarette = viewModel.latestCigarette else {
+            return "--"
+        }
 
-    private var counterSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let interval = Date().timeIntervalSince(
+            latestCigarette.smokedAt
+        )
 
-            Text("\(cigaretteCount)")
+        return viewModel.formatDuration(interval)
+    }
+    
+    // MARK: - Today Spending
+    private var todaySpending: Int {
+        
+        guard let settings = viewModel.settings else {
+            return 0
+        }
+        
+
+        let cigarettePrice = Double(settings.cigarettePricePaise)/100.0
+        
+
+        return Int(
+            Double(viewModel.cigaretteCount)
+            * cigarettePrice
+        )
+    }
+    
+    // MARK: - Stat Item
+    private func statItem(
+        title: LocalizedStringKey,
+        value: String
+    ) -> some View {
+        VStack(
+            alignment: .leading,
+            spacing: 4
+        ) {
+            
+            Text(title)
                 .font(
                     .system(
-                        size: 72,
-                        weight: .bold,
-                        design: .default
+                        size: 12,
+                        weight: .semibold
                     )
                 )
-                .tracking(-3)
-                .foregroundStyle(.white)
-                .lineLimit(1)
-
-            Text("CIGARETTES")
-                .font(.system(size: 28, weight: .bold))
-                .tracking(-0.5)
-                .foregroundStyle(.white)
+                .tracking(1.0)
+                .foregroundColor(
+                    AppColors.tertiaryColor
+                )
+            
+            Text(value)
+                .font(
+                    .system(
+                        size: 40,
+                        weight: .light
+                    )
+                )
+                .foregroundColor(
+                    AppColors.primaryColor
+                )
         }
     }
-
-    // MARK: - Stats
-
-    private var statsSection: some View {
-        HStack(spacing: 16) {
-
-            StatView(
-                title: "DAILY AVERAGE",
-                value: "9.2"
-            )
-
-            StatView(
-                title: "LAST LOG",
-                value: "42",
-                suffix: "m"
-            )
-
-            StatView(
-                title: "SPENDING",
-                value: "₹84"
-            )
-        }
-        .padding(.vertical, 16)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
-        }
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
-        }
-    }
-
-    // MARK: - Count Button
-
-    private var countButton: some View {
-        Button {
-            cigaretteCount += 1
-        } label: {
-            HStack(spacing: 8) {
-
-                Image(systemName: "plus")
-                    .font(.system(size: 26, weight: .medium))
-
-                Text("Count Cigarette")
-                    .font(.system(size: 28, weight: .bold))
-                    .tracking(-0.5)
-            }
-            .foregroundStyle(.black)
-            .frame(maxWidth: .infinity)
-            .frame(height: 64)
-            .background(Color.white)
-            .clipShape(Capsule())
-        }
-        .buttonStyle(.plain)
-        .scaleEffect(1.0)
-    }
-
-    // MARK: - Timeline
-
-    private var timeline: some View {
-        VStack(alignment: .leading, spacing: 0) {
-
-            Text("TIMELINE")
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(1.5)
-                .foregroundStyle(Color.secondaryText)
-                .padding(.bottom, 8)
-
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
-
-            TimelineRow(
-                time: "10:40 AM",
-                title: "Cigarette"
-            )
-
-            TimelineRow(
-                time: "8:12 AM",
-                title: "Cigarette"
-            )
-        }
-    }
-
-    // MARK: - Bottom Navigation
-
-    private var bottomNavigation: some View {
-        HStack {
-
-            BottomTab(
-                icon: "house.fill",
-                title: "Home",
-                isSelected: selectedTab == .home
-            ) {
-                selectedTab = .home
-            }
-
-            BottomTab(
-                icon: "chart.bar.xaxis",
-                title: "Analytics",
-                isSelected: selectedTab == .analytics
-            ) {
-                selectedTab = .analytics
-            }
-
-            BottomTab(
-                icon: "gearshape",
-                title: "Settings",
-                isSelected: selectedTab == .settings
-            ) {
-                selectedTab = .settings
-            }
-        }
-        .padding(.horizontal, 24)
-        .frame(height: 64)
-        .background(Color.background)
-        .overlay(alignment: .top) {
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
-        }
-    }
-}
-
-// MARK: - Stat View
-
-struct StatView: View {
-
-    let title: String
-    let value: String
-    var suffix: String? = nil
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-
+    
+    // MARK: - Stat With Unit
+    private func statItemWithUnit(
+        title: LocalizedStringKey,
+        value: String,
+        unit: String
+    ) -> some View {
+        
+        VStack(
+            alignment: .leading,
+            spacing: 4
+        ) {
+            
             Text(title)
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(1.2)
-                .foregroundStyle(Color.secondaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-
-            HStack(alignment: .lastTextBaseline, spacing: 3) {
-
+                .font(
+                    .system(
+                        size: 12,
+                        weight: .semibold
+                    )
+                )
+                .tracking(1.0)
+                .foregroundColor(
+                    AppColors.tertiaryColor
+                )
+            
+            HStack(
+                alignment: .firstTextBaseline,
+                spacing: 2
+            ) {
+                
                 Text(value)
                     .font(
                         .system(
-                            size: 48,
-                            weight: .light,
-                            design: .rounded
+                            size: 40,
+                            weight: .light
                         )
                     )
-                    .tracking(-2)
-                    .foregroundStyle(.white)
+                    .foregroundColor(
+                        AppColors.primaryColor
+                    )
+                
+                Text(unit)
+                    .font(
+                        .system(size: 20)
+                    )
+                    .foregroundColor(
+                        AppColors.tertiaryColor
+                    )
+            }
+        }
+    }
+    
+    // MARK: - Timeline Row
+    private func timelineRow(
+        cigarette: CigaretteModel
+    ) -> some View {
+        
+        HStack {
+            
+            Text(
+                cigarette.smokedAt.formatted(
+                    .dateTime
+                        .hour()
+                        .minute()
+                        .locale(Locale.current)
+                )
+            )
+            .font(
+                .system(size: 16)
+            )
+            .foregroundColor(
+                AppColors.tertiaryColor
+            )
+            .frame(
+                width: 85,
+                alignment: .leading
+            )
+            
+            VStack(
+                alignment: .leading,
+                spacing: 3
+            ) {
+                
+                Text("Cigarette")
+                    .font(
+                        .system(
+                            size: 16,
+                            weight: .bold
+                        )
+                    )
+                    .foregroundColor(
+                        AppColors.primaryColor
+                    )
+                
+                if let trigger =
+                    cigarette.trigger {
+                    
+                    Text(trigger.title)
+                        .font(
+                            .system(
+                                size: 12,
+                                weight: .medium
+                            )
+                        )
+                        .foregroundColor(
+                            AppColors.tertiaryColor
+                        )
+                }
+            }
+            
+            Spacer()
+            
+            Button {
+                
+                Task {
+                    await viewModel.deleteCigarette(
+                        cigarette
+                    )
+                }
+                
+            } label: {
+                
+                Image(
+                    systemName: "trash.fill"
+                )
+                .foregroundColor(
+                    Color(hex: "#FFB4AB")
+                )
+            }
+        }
+        .padding(.vertical, 12)
+    }
+}
+extension HomeView {
+    private var cigaretteCount: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            
+            Text(
+                "\(viewModel.cigaretteCount)"
+            )
+            .font(
+                .system(
+                    size: 72,
+                    weight: .bold
+                )
+            )
+            .foregroundColor(
+                AppColors.primaryColor
+            )
+            
+            Text(
+                viewModel.cigaretteCount == 1
+                ? "CIGARETTE"
+                : "CIGARETTES"
+            )
+            .font(
+                .system(
+                    size: 28,
+                    weight: .bold
+                )
+            )
+            .tracking(-0.5)
+            .foregroundColor(
+                AppColors.primaryColor
+            )
+        }
+    }
+}
+extension HomeView {
+    private var cigaretteSummary: some View {
+        VStack(
+            alignment: .leading,
+            spacing: 20
+        ) {
+            
+            statItem(
+                title: "TODAY",
+                value: "\(viewModel.cigaretteCount)"
+            )
+            
+            statItemWithUnit(
+                title: "LAST CIGARETTE",
+                value: lastCigaretteValue,
+                unit: ""
+            )
+            
+            statItem(
+                title: "SPENDING",
+                value: "₹\(todaySpending)"
+            )
+        }
+    }
+}
+extension HomeView {
+//    private var timeLine: some View {
+//        VStack(
+//            alignment: .leading,
+//            spacing: 16
+//        ) {
+//            
+//            Text("TIMELINE")
+//                .font(
+//                    .system(
+//                        size: 12,
+//                        weight: .bold
+//                    )
+//                )
+//                .tracking(1.5)
+//                .foregroundColor(
+//                    AppColors.tertiaryColor
+//                )
+//            
+//            if viewModel.cigarettes.isEmpty {
+//                
+//                Text(
+//                    "No cigarettes logged today"
+//                )
+//                .font(
+//                    .system(size: 15)
+//                )
+//                .foregroundColor(
+//                    AppColors.tertiaryColor
+//                )
+//                .padding(.vertical, 12)
+//                
+//            } else {
+//                
+//                ForEach(
+//                    viewModel.cigarettes
+//                ) { cigarette in
+//                    
+//                    timelineRow(
+//                        cigarette: cigarette
+//                    )
+//                    
+//                    Divider()
+//                        .overlay(
+//                            AppColors.tertiaryColor
+//                        )
+//                }
+//            }
+//        }
+//    }
+    private var timeLine: some View {
+        VStack(
+            alignment: .leading,
+            spacing: 16
+        ) {
+            Text("TIMELINE")
+                .font(
+                    .system(
+                        size: 12,
+                        weight: .bold
+                    )
+                )
+                .tracking(1.5)
+                .foregroundColor(
+                    AppColors.tertiaryColor
+                )
 
-                if let suffix {
-                    Text(suffix)
-                        .font(.system(size: 20, weight: .regular))
-                        .foregroundStyle(Color.secondaryText)
+            if viewModel.cigarettes.isEmpty {
+
+                Text("No cigarettes logged today")
+                    .font(.system(size: 15))
+                    .foregroundColor(
+                        AppColors.tertiaryColor
+                    )
+                    .padding(.vertical, 12)
+
+            } else {
+
+                // Show only first 5
+//                ForEach(
+//                    viewModel.cigarettes.prefix(5)
+//                ) { cigarette in
+//
+//                    timelineRow(
+//                        cigarette: cigarette
+//                    )
+//
+//                    Divider()
+//                        .overlay(
+//                            AppColors.tertiaryColor
+//                        )
+//                }
+                ForEach(
+                    showAllCigarettes
+                        ? viewModel.cigarettes
+                        : Array(viewModel.cigarettes.prefix(5))
+                ) { cigarette in
+
+                    timelineRow(
+                        cigarette: cigarette
+                    )
+
+                    Divider()
+                        .overlay(
+                            AppColors.tertiaryColor
+                        )
+                }
+
+                // Show More
+//                if viewModel.cigarettes.count > 5 {
+//
+//                    Button {
+//                        // Handle show more
+//                    } label: {
+//                        HStack {
+//                            Spacer()
+//
+//                            Text(
+//                                "Show More"
+//                            )
+//                            .font(
+//                                .system(
+//                                    size: 15,
+//                                    weight: .semibold
+//                                )
+//                            )
+//                            .foregroundColor(
+//                                AppColors.primaryColor
+//                            )
+//
+//                            Image(
+//                                systemName: "chevron.down"
+//                            )
+//                            .font(
+//                                .system(
+//                                    size: 12,
+//                                    weight: .semibold
+//                                )
+//                            )
+//                            .foregroundColor(
+//                                AppColors.tertiaryColor
+//                            )
+//
+//                            Spacer()
+//                        }
+//                        .padding(.vertical, 14)
+//                    }
+//                    .buttonStyle(.plain)
+//                }
+                if viewModel.cigarettes.count > 5 {
+
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showAllCigarettes.toggle()
+                        }
+                    } label: {
+
+                        HStack {
+                            Spacer()
+
+                            Text(
+                                showAllCigarettes
+                                    ? "Show Less"
+                                    : "Show More"
+                            )
+                            .font(
+                                .system(
+                                    size: 15,
+                                    weight: .semibold
+                                )
+                            )
+                            .foregroundColor(
+                                AppColors.primaryColor
+                            )
+
+                            Image(
+                                systemName: showAllCigarettes
+                                    ? "chevron.up"
+                                    : "chevron.down"
+                            )
+                            .font(
+                                .system(
+                                    size: 12,
+                                    weight: .semibold
+                                )
+                            )
+                            .foregroundColor(
+                                AppColors.tertiaryColor
+                            )
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 14)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
-}
-
-// MARK: - Timeline Row
-
-struct TimelineRow: View {
-
-    let time: String
-    let title: String
-
-    var body: some View {
-        HStack {
-
-            HStack(spacing: 16) {
-
-                Text(time)
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.secondaryText)
-                    .frame(width: 80, alignment: .leading)
-
-                Text(title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-
-            Spacer()
-
-            Button {
-                // More options
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 18, weight: .light))
-                    .foregroundStyle(Color.secondaryText)
-                    .frame(width: 40, height: 40)
-            }
-        }
-        .padding(.vertical, 16)
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(Color.outline)
-                .frame(height: 1)
-        }
-    }
-}
-
-// MARK: - Bottom Tab
-
-struct BottomTab: View {
-
-    let icon: String
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-
-            VStack(spacing: 4) {
-
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: isSelected ? .medium : .light))
-
-                Text(title)
-                    .font(.system(size: 12, weight: .semibold))
-                    .tracking(1.2)
-                    .textCase(.uppercase)
-            }
-            .foregroundStyle(
-                isSelected
-                ? Color.white
-                : Color.secondaryText.opacity(0.5)
-            )
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Tab
-
-enum Tab {
-    case home
-    case analytics
-    case settings
-}
-
-// MARK: - Colors
-
-extension Color {
-
-    static let background = Color(
-        red: 14 / 255,
-        green: 14 / 255,
-        blue: 14 / 255
-    )
-
-    static let secondaryText = Color(
-        red: 163 / 255,
-        green: 163 / 255,
-        blue: 163 / 255
-    )
-
-    static let outline = Color(
-        red: 57 / 255,
-        green: 57 / 255,
-        blue: 57 / 255
-    )
-}
-
-// MARK: - Preview
-
-#Preview {
-    ContentView1()
 }

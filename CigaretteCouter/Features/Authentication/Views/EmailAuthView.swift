@@ -13,7 +13,7 @@ struct EmailAuthView: View {
 
     @Environment(AppViewModel.self)
     private var appViewModel
-
+    @State private var viewModel = EmailAuthViewModel()
     @State private var mode: Mode
 
     @State private var fullName = ""
@@ -22,7 +22,7 @@ struct EmailAuthView: View {
     @State private var confirmPassword = ""
 
     @State private var showForgotPassword = false
-    @State private var errorMessage: String?
+
 
     init(mode: Mode) {
         _mode = State(initialValue: mode)
@@ -40,7 +40,7 @@ struct EmailAuthView: View {
 
                 // MARK: - Brand
 
-                Text("CIGARETTE COUNTER")
+                Text("PUFF COUNTER")
                     .font(
                         .system(
                             size: 26,
@@ -66,7 +66,7 @@ struct EmailAuthView: View {
                     )
                 )
                 .tracking(-0.5)
-                .foregroundStyle(.white)
+                .foregroundStyle(AppColors.primaryColor)
 
                 Text(
                     isSignUp
@@ -74,7 +74,7 @@ struct EmailAuthView: View {
                     : "Sign in to continue tracking your progress."
                 )
                 .font(.system(size: 14))
-                .foregroundStyle(AppColors.neutralColor)
+                .foregroundStyle(AppColors.tertiaryColor)
                 .lineSpacing(2)
                 .padding(.top, 8)
                 .padding(.bottom, 36)
@@ -126,7 +126,7 @@ struct EmailAuthView: View {
 
                 // MARK: - Error
 
-                if let errorMessage {
+                if let errorMessage = viewModel.errorMessage {
 
                     Text(errorMessage)
                         .font(.system(size: 13))
@@ -155,7 +155,7 @@ struct EmailAuthView: View {
                                 )
                                 .tracking(1.1)
                                 .foregroundStyle(
-                                    AppColors.neutralColor
+                                    AppColors.primaryColor
                                 )
                         }
                         .buttonStyle(.plain)
@@ -171,19 +171,27 @@ struct EmailAuthView: View {
 
                     HStack(spacing: 8) {
 
-                        Text(
-                            isSignUp
-                            ? "CREATE ACCOUNT"
-                            : "SIGN IN"
-                        )
+                        if viewModel.isLoading {
 
-                        Image(systemName: "arrow.right")
-                            .font(
-                                .system(
-                                    size: 14,
-                                    weight: .bold
-                                )
+                            ProgressView()
+                                .tint(.black)
+
+                        } else {
+
+                            Text(
+                                isSignUp
+                                ? "CREATE ACCOUNT"
+                                : "SIGN IN"
                             )
+
+                            Image(systemName: "arrow.right")
+                                .font(
+                                    .system(
+                                        size: 14,
+                                        weight: .bold
+                                    )
+                                )
+                        }
                     }
                     .font(
                         .system(
@@ -191,11 +199,13 @@ struct EmailAuthView: View {
                             weight: .bold
                         )
                     )
-                    .foregroundStyle(.black)
+                    .foregroundStyle(AppColors.neutralColor)
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)
-                    .background(.white)
+                    .background(AppColors.primaryColor)
                     .clipShape(Capsule())
+                    .disabled(viewModel.isLoading)
+                    .opacity(viewModel.isLoading ? 0.6 : 1)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, isSignUp ? 32 : 28)
@@ -218,8 +228,8 @@ struct EmailAuthView: View {
                                 ? .signIn
                                 : .signUp
 
-                            // Clear form-specific values
-                            errorMessage = nil
+
+                            viewModel.clearError()
                             password = ""
                             confirmPassword = ""
                         }
@@ -295,73 +305,130 @@ struct EmailAuthView: View {
 
     // MARK: - Submit
 
+
     private func submit() {
 
-        errorMessage = nil
+        viewModel.clearError()
 
-        // Basic validation
+        let cleanEmail = email
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+            .lowercased()
 
-        guard !email.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        ).isEmpty else {
+        let cleanName = fullName
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
 
-            errorMessage = "Please enter your email."
+        guard !cleanEmail.isEmpty else {
+
+            viewModel.errorMessage =
+                "Please enter your email."
+
             return
         }
 
         guard !password.isEmpty else {
 
-            errorMessage = "Please enter your password."
+            viewModel.errorMessage =
+                "Please enter your password."
+
             return
         }
 
         if isSignUp {
 
-            guard !fullName.trimmingCharacters(
-                in: .whitespacesAndNewlines
-            ).isEmpty else {
+            guard !cleanName.isEmpty else {
 
-                errorMessage = "Please enter your full name."
+                viewModel.errorMessage =
+                    "Please enter your full name."
+
                 return
             }
 
             guard password.count >= 6 else {
 
-                errorMessage = "Password must contain at least 6 characters."
+                viewModel.errorMessage =
+                    "Password must contain at least 6 characters."
+
                 return
             }
 
             guard password == confirmPassword else {
 
-                errorMessage = "Passwords do not match."
+                viewModel.errorMessage =
+                    "Passwords do not match."
+
+                return
+            }
+        }
+
+        Task {
+
+            let user: UserModel?
+
+            if isSignUp {
+
+                user = await viewModel.signUp(
+                    fullName: cleanName,
+                    email: cleanEmail,
+                    password: password
+                )
+
+            } else {
+
+                user = await viewModel.signIn(
+                    email: cleanEmail,
+                    password: password
+                )
+            }
+
+            guard let user else {
                 return
             }
 
-            // Dummy signup
+            appViewModel.setAuthenticatedUser(user)
 
-            appViewModel.isAuthenticated = true
-            appViewModel.currentUserName = fullName
-            appViewModel.currentUserEmail = email
-
-        } else {
-
-            // Dummy login
-
-            appViewModel.isAuthenticated = true
-            appViewModel.currentUserName = "Mohammad Shiraz"
-            appViewModel.currentUserEmail = email
+            dismiss()
         }
-
-        dismiss()
     }
 
     // MARK: - Forgot Password
-
+//
+//    private func sendPasswordReset() {
+//
+//        print(
+//            "Password reset requested for:",
+//            email
+//        )
+//    }
+    
     private func sendPasswordReset() {
 
-        print(
-            "Password reset requested for:",
-            email
-        )
+        let cleanEmail = email
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+            .lowercased()
+
+        guard !cleanEmail.isEmpty else {
+
+            viewModel.errorMessage =
+                "Please enter your email."
+
+            return
+        }
+
+        Task {
+
+            let success = await viewModel.sendPasswordReset(
+                email: cleanEmail
+            )
+
+            if success {
+                showForgotPassword = false
+            }
+        }
     }
 }

@@ -1,54 +1,10 @@
-////
-////  UnderlineSecureField.swift
-////  CigaretteCouter
-////
-////  Created by Shiraz on 21/08/26.
-////
 //
-//import SwiftUI
+//  UnderlineSecureField.swift
+//  CigaretteCouter
 //
-//struct UnderlineSecureField: View {
+//  Created by Shiraz on 21/08/26.
 //
-//    let title: String
-//    let placeholder: String
-//
-//    @Binding var text: String
-//
-//    var body: some View {
-//        VStack(alignment: .leading, spacing: 8) {
-//
-//            Text(title)
-//                .font(
-//                    .system(
-//                        size: 12,
-//                        weight: .semibold
-//                    )
-//                )
-//                .tracking(1.2)
-//                .foregroundStyle(
-//                    AppColors.neutralColor
-//                )
-//
-//            SecureField(
-//                placeholder,
-//                text: $text
-//            )
-//            .font(.system(size: 16))
-//            .foregroundStyle(.white)
-//            .textInputAutocapitalization(.never)
-//            .autocorrectionDisabled()
-//            .padding(.vertical, 8)
-////            .overlay(alignment: .bottom) {
-////                Rectangle()
-////                    .fill(
-////                        AppColors.neutralColor
-////                            .opacity(0.5)
-////                    )
-////                    .frame(height: 1)
-////            }
-//        }
-//    }
-//}
+
 import SwiftUI
 
 struct UnderlineSecureField: View {
@@ -71,7 +27,7 @@ struct UnderlineSecureField: View {
                 )
                 .tracking(1.1)
                 .foregroundStyle(
-                    AppColors.neutralColor
+                    AppColors.primaryColor
                 )
 
             SecureField(
@@ -86,7 +42,7 @@ struct UnderlineSecureField: View {
 
             Rectangle()
                 .fill(
-                    AppColors.neutralColor
+                    AppColors.tertiaryColor
                         .opacity(0.45)
                 )
                 .frame(height: 1)

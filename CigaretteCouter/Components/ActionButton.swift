@@ -7,12 +7,82 @@
 
 import SwiftUI
 
-struct ActionButton: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct AccountButton: View {
+    
+    enum ButtonStyle {
+        case apple
+        case google
+        case email
     }
-}
+    
+    let title: String
+    let style: ButtonStyle
+    let action: () -> Void
+    
+    var body: some View {
+        
+        Button(action: action) {
+            
+            HStack(spacing: 12) {
+                
+                if style == .apple {
+                    Image(systemName: "apple.logo")
+                        .font(.system(size: 26))
+                }
+                
+                if style == .google {
 
-#Preview {
-    ActionButton()
+                    Image("googleIcon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                }
+                
+                Text(title)
+                    .font(.system(size: 16))
+            }
+            .foregroundStyle(foregroundColor)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .background(backgroundColor)
+            .clipShape(Capsule())
+            .overlay {
+                if style == .email {
+                    Capsule()
+                        .stroke(
+                            AppColors.tertiaryColor,
+                            lineWidth: 1
+                        )
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private var backgroundColor: Color {
+        
+        switch style {
+        case .apple:
+            return AppColors.primaryColor
+            
+        case .google:
+            return AppColors.tertiaryColor.opacity(0.5)
+
+            
+            
+        case .email:
+            return .clear
+        }
+    }
+    
+    private var foregroundColor: Color {
+        
+        switch style {
+        case .apple:
+            return AppColors.neutralColor
+            
+        case .google, .email:
+            return AppColors.primaryColor
+        }
+    }
 }
