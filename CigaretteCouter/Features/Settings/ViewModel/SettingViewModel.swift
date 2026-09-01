@@ -1,9 +1,9 @@
-////////
-////////  SettingViewModel.swift
-////////  CigaretteCouter
-////////
-////////  Created by Shiraz on 18/08/26.
-////////
+//
+//  SettingViewModel.swift
+//  CigaretteCouter
+//
+//  Created by Shiraz on 18/08/26.
+//
 
 import Foundation
 import Observation
@@ -68,19 +68,7 @@ final class SettingsViewModel {
         await saveSettings()
     }
     
-    //    func updateCigarettesPerPack(_ value: Int) async {
-    //
-    //        settings.cigarettesPerPack = value
-    //
-    //        await saveSettings()
-    //    }
-    
-    //    func updatePackPrice(_ paise: Int) async {
-    //
-    //        settings.packPricePaise = paise
-    //
-    //        await saveSettings()
-    //    }
+  
     func updateCigarettePrice(_ paise: Int) async {
         
         settings.cigarettePricePaise = paise

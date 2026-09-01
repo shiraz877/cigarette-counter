@@ -18,11 +18,11 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @State private var showLogoutToast = false
     
-
+    
     enum SettingEditor: Identifiable {
         case cigarettePrice
         case language
-
+        
         var id: Self { self }
     }
     
@@ -48,7 +48,7 @@ struct SettingsView: View {
                 
                 settingsSection(title: "tracking_title") {
                     
-
+                    
                     SettingsRowView(
                         title: "Cigarette price",
                         value: viewModel.cigarettePrice,
@@ -57,45 +57,17 @@ struct SettingsView: View {
                         editingSetting = .cigarettePrice
                     }
                     
-//                    SettingsRowView(
-//                        title: "Cigarette price",
-//                        value: viewModel.cigarettePrice
-//                    ) {
-//                        editingSetting = .cigarettePrice
-//                    }
+                    
                     Divider().overlay(AppColors.primaryColor)
                     
-
+                    
                     
                 }
                 
                 
-               
                 
                 
-                // MARK: Privacy
                 
-                settingsSection(title: "PRIVACY") {
-                    
-                    SettingsActionRowView(
-                        title: "Privacy Policy",
-                        icon: "arrow.forward"
-                    ) {
-                        openURL(AppConstants.URLs.privacyPolicy)
-                    }
-                    Divider().overlay(AppColors.primaryColor)
-                    
-                    
-                    SettingsActionRowView(
-                        title: "Terms of Service",
-                        icon: "arrow.forward"
-                    ) {
-                        openURL(AppConstants.URLs.termsOfUse)
-
-                    }
-                    Divider().overlay(AppColors.primaryColor)
-                    
-                }
                 
                 // MARK: App
                 
@@ -106,7 +78,7 @@ struct SettingsView: View {
                     ) {
                         editingSetting = .language
                     }
-
+                    
                     Divider()
                         .overlay(AppColors.primaryColor)
                     
@@ -138,15 +110,40 @@ struct SettingsView: View {
                     
                 }
                 
+                
+                // MARK: Privacy
+                
+                settingsSection(title: "PRIVACY") {
+                    
+                    SettingsActionRowView(
+                        title: "Privacy Policy",
+                        icon: "arrow.forward"
+                    ) {
+                        openURL(AppConstants.URLs.privacyPolicy)
+                    }
+                    Divider().overlay(AppColors.primaryColor)
+                    
+                    
+                    SettingsActionRowView(
+                        title: "Terms of Service",
+                        icon: "arrow.forward"
+                    ) {
+                        openURL(AppConstants.URLs.termsOfUse)
+                        
+                    }
+                    Divider().overlay(AppColors.primaryColor)
+                    
+                }
+                
                 settingsSection(title: "DATA") {
-        
+                    
                     SettingsActionRowView(
                         title: "Log Out",
                         icon: "rectangle.portrait.and.arrow.right",
                         isDestructive: true
                     ) {
-                   logOut()
-                   
+                        logOut()
+                        
                     }
                     Divider().overlay(AppColors.primaryColor)
                     
@@ -161,7 +158,7 @@ struct SettingsView: View {
                     
                 }
                 
-          
+                
                 
                 
                 
@@ -203,7 +200,7 @@ struct SettingsView: View {
             NavigationStack {
                 
                 switch setting {
-
+                    
                     
                     
                 case .cigarettePrice:
@@ -211,17 +208,19 @@ struct SettingsView: View {
                     CigarettePriceView(
                         initialPricePaise: viewModel.settings.cigarettePricePaise
                     ) { paise in
-                    
+                        
                         await viewModel.updateCigarettePrice(paise)
                     }
                 case .language:
                     LanguageSettingsView()
                     
-
+                    
                 }
             }
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
+            .presentationBackground(.black)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             
         }
     }
@@ -233,7 +232,7 @@ extension SettingsView {
     
     @ViewBuilder
     func settingsSection<Content: View>(
-//        title: String,
+        
         title: LocalizedStringKey,
         @ViewBuilder content: () -> Content
     ) -> some View {
@@ -255,12 +254,12 @@ extension SettingsView {
             }
         }
     }
-
+    
     private func logOut() {
         Task {
             await appViewModel.signOut()
-
-
+            
+            
         }
     }
 }

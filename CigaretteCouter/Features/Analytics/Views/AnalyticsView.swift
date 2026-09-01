@@ -143,7 +143,7 @@ private extension AnalyticsView {
                         )
                     )
                     .foregroundStyle(
-                        AppColors.tertiaryColor
+                        AppColors.secondaryColor
                     )
                 }
             }
@@ -224,7 +224,7 @@ private extension AnalyticsView {
                         )
                     )
                     .foregroundStyle(
-                        AppColors.tertiaryColor
+                        AppColors.secondaryColor
                     )
                 }
             }
@@ -400,6 +400,7 @@ struct InsightCard: View {
         .background(
             AppColors.secondaryColor
         )
+        .cornerRadius(15)
         
     }
 }
@@ -433,10 +434,7 @@ private extension AnalyticsView {
 
     var recommendationSection: some View {
         VStack(spacing: 16) {
-            AnalyticsMessageCard(
-                icon: "arrow.down.right",
-                message: "You smoked 12% less this week compared to last week. Keep it up."
-            )
+
 
             AnalyticsMessageCard(
                 icon: "clock",

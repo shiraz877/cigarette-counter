@@ -55,7 +55,7 @@ struct AccountView: View {
                     
                     accountIcon
                     
-                    //                    Text("Create your account")
+                  
                     Text("account.create_title")
                         .font(
                             .system(
@@ -192,7 +192,7 @@ struct AccountView: View {
                             )
                             .font(.system(size: 13))
                             .foregroundStyle(
-                                AppColors.neutralColor
+                                AppColors.tertiaryColor
                             )
                         }
                         
@@ -209,7 +209,8 @@ struct AccountView: View {
                     .padding(16)
                 }
                 .background(
-                    Color.white.opacity(0.05)
+//                    Color.white.opacity(0.05)
+                    AppColors.secondaryColor
                 )
                 .clipShape(
                     RoundedRectangle(
@@ -221,15 +222,7 @@ struct AccountView: View {
                 
                 VStack(spacing: 0) {
                     
-                    //                    accountRow(
-                    //                        icon: "person",
-                    //                        title: "Account Settings"
-                    //                    ) {
-                    //
-                    //                        print("Account Settings")
-                    //
-                    //
-                    //                    }
+               
                     accountNavigationRow( icon: "person", title: "Account Settings" ) { SettingsView() }
                     
                     Divider()
@@ -237,13 +230,13 @@ struct AccountView: View {
                             Color.white.opacity(0.08)
                         )
                     
-                    accountRow(
-                        icon: "arrow.clockwise",
-                        title: "Sync Data"
-                    ) {
-                        
-                        print("Sync Data")
-                    }
+//                    accountRow(
+//                        icon: "arrow.clockwise",
+//                        title: "Sync Data"
+//                    ) {
+//                        
+//                        print("Sync Data")
+//                    }
                     
                     Divider()
                         .overlay(
@@ -261,7 +254,8 @@ struct AccountView: View {
                     }
                 }
                 .background(
-                    Color.white.opacity(0.05)
+//                    Color.white.opacity(0.05)
+                    AppColors.secondaryColor
                 )
                 .clipShape(
                     RoundedRectangle(
@@ -411,13 +405,7 @@ struct AccountView: View {
         }
     }
     
-    //    private func signInWithGoogle() {
-    //
-    ////        print("Google login")
-    //        Task {
-    //             await viewModel.signInWithGoogle()
-    //         }
-    //    }
+ 
     private func signInWithGoogle() {
         
         Task {
@@ -463,7 +451,7 @@ struct AccountView: View {
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12))
-                    .foregroundStyle(AppColors.neutralColor)
+                    .foregroundStyle(AppColors.primaryColor)
             }
             .padding(16)
         }

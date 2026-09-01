@@ -218,41 +218,41 @@ struct SettingsRowView: View {
     }
 }
 
-struct StatusBadge: View {
-    let title: String
-    let isOn: Bool
-
-    var body: some View {
-        Text(title)
-            .font(
-                .system(
-                    size: 12,
-                    weight: .semibold
-                )
-            )
-            .tracking(1)
-            .foregroundStyle(
-                isOn
-                ? AppColors.neutralColor
-                : AppColors.tertiaryColor
-            )
-            .padding(.horizontal, 12)
-            .padding(.vertical, 4)
-            .background(
-                isOn
-                ? Color.white
-                : AppColors.secondaryColor
-            )
-            .clipShape(Capsule())
-            .overlay {
-                if !isOn {
-                    Capsule()
-                        .stroke(
-                            AppColors.secondaryColor,
-                            lineWidth: 1
-                        )
-                }
-            }
-    }
-}
+//struct StatusBadge: View {
+//    let title: String
+//    let isOn: Bool
+//
+//    var body: some View {
+//        Text(title)
+//            .font(
+//                .system(
+//                    size: 12,
+//                    weight: .semibold
+//                )
+//            )
+//            .tracking(1)
+//            .foregroundStyle(
+//                isOn
+//                ? AppColors.neutralColor
+//                : AppColors.tertiaryColor
+//            )
+//            .padding(.horizontal, 12)
+//            .padding(.vertical, 4)
+//            .background(
+//                isOn
+//                ? Color.white
+//                : AppColors.secondaryColor
+//            )
+//            .clipShape(Capsule())
+//            .overlay {
+//                if !isOn {
+//                    Capsule()
+//                        .stroke(
+//                            AppColors.secondaryColor,
+//                            lineWidth: 1
+//                        )
+//                }
+//            }
+//    }
+//}
 

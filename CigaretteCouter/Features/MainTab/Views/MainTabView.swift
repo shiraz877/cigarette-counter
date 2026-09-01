@@ -52,7 +52,8 @@ struct MainTabView: View {
                     SettingsView()
                 }
             }
-            .tint(AppColors.primaryColor)
+            .tint(AppColors.neutralColor)
+//            .tint(.red)
         }
         .mainBackgroundColor()
         .sheet(isPresented: $showAccountSheet) {
