@@ -17,7 +17,10 @@ struct SettingsView: View {
     private var appViewModel
     @Environment(\.openURL) private var openURL
     @State private var showLogoutToast = false
-    
+    @State private var showRateApp = false
+    @State private var showSupport = false
+    @State private var showHelp = false
+    @State private var showRateAppDialog = false
     
     enum SettingEditor: Identifiable {
         case cigarettePrice
@@ -82,31 +85,55 @@ struct SettingsView: View {
                     Divider()
                         .overlay(AppColors.primaryColor)
                     
+//                    SettingsActionRowView(
+//                        title: "Rate us",
+//                        icon: "star"
+//                    ) {
+//                        viewModel.rateApp()
+//                    }
+//                    Divider().overlay(AppColors.primaryColor)
                     SettingsActionRowView(
                         title: "Rate us",
                         icon: "star"
                     ) {
-                        viewModel.rateApp()
+//                        showRateApp = true
+                        showRateAppDialog = true
                     }
                     Divider().overlay(AppColors.primaryColor)
                     
                     
-                    SettingsActionRowView(
-                        title: "Share",
-                        icon: "square.and.arrow.up"
-                    ) {
-                        viewModel.shareApp()
-                    }
-                    Divider().overlay(AppColors.primaryColor)
+//                    SettingsActionRowView(
+//                        title: "Share",
+//                        icon: "square.and.arrow.up"
+//                    ) {
+//                        viewModel.shareApp()
+//                    }
+//                    Divider().overlay(AppColors.primaryColor)
                     
                     
                     SettingsActionRowView(
                         title: "Support",
                         icon: "questionmark"
                     ) {
-                        viewModel.openSupport()
+//                        viewModel.openSupport()
+//                        guard let url = viewModel.supportURL else {
+//                               return
+//                           }
+//
+//                           openURL(url)
+                        showSupport = true
                     }
                     Divider().overlay(AppColors.primaryColor)
+                    
+                    SettingsActionRowView(
+                        title: "Help",
+                        icon: "questionmark.circle"
+                    ) {
+                        showHelp = true
+                    }
+
+                    Divider()
+                        .overlay(AppColors.primaryColor)
                     
                 }
                 
@@ -222,6 +249,34 @@ struct SettingsView: View {
             .presentationBackground(.black)
             .toolbarColorScheme(.dark, for: .navigationBar)
             
+        }
+//        .sheet(isPresented: $showRateApp) {
+//            RateAppView()
+//                .presentationDetents([.medium, .large])
+//                .presentationDragIndicator(.visible)
+//                .presentationBackground(.black)
+//                .toolbarColorScheme(.dark, for: .navigationBar)
+//        }
+        .overlay {
+            if showRateAppDialog {
+                RateAppDialog(
+                    isPresented: $showRateAppDialog
+                )
+            }
+        }
+        .sheet(isPresented: $showSupport) {
+            SupportView()
+                .presentationDetents([.large])
+//                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.black)
+        }
+        .sheet(isPresented: $showHelp) {
+            HelpView()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.black)
+                .toolbarColorScheme(.dark, for: .navigationBar)
         }
     }
     

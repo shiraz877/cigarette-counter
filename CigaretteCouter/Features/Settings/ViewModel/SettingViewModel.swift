@@ -134,6 +134,51 @@ final class SettingsViewModel {
     func openSupport() {
         print("Support")
     }
+    var supportURL: URL? {
+         var components = URLComponents()
+
+         components.scheme = "mailto"
+         components.path = AppConstants.Support.email
+         components.queryItems = [
+             URLQueryItem(
+                 name: "subject",
+                 value: AppConstants.Support.subject
+             ),
+             URLQueryItem(
+                 name: "body",
+                 value: supportEmailBody
+             )
+         ]
+
+         return components.url
+     }
+    private var supportEmailBody: String {
+           """
+           Hi,
+
+           I need help with Cigarette Counter.
+
+           Please describe your issue below:
+
+           
+
+           ------------------------------
+           App Information
+           ------------------------------
+
+           App Version: \(appVersion)
+           iOS Version: \(iOSVersion)
+           """
+       }
+    private var appVersion: String {
+           Bundle.main.object(
+               forInfoDictionaryKey: "CFBundleShortVersionString"
+           ) as? String ?? "Unknown"
+       }
+
+       private var iOSVersion: String {
+           ProcessInfo.processInfo.operatingSystemVersionString
+       }
     
     
     

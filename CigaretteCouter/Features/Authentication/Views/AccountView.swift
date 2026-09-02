@@ -212,11 +212,11 @@ struct AccountView: View {
 //                    Color.white.opacity(0.05)
                     AppColors.secondaryColor
                 )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 16
-                    )
-                )
+//                .clipShape(
+//                    RoundedRectangle(
+//                        cornerRadius: 16
+//                    )
+//                )
                 
                 // MARK: Account Actions
                 
@@ -257,11 +257,11 @@ struct AccountView: View {
 //                    Color.white.opacity(0.05)
                     AppColors.secondaryColor
                 )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 16
-                    )
-                )
+//                .clipShape(
+//                    RoundedRectangle(
+//                        cornerRadius: 16
+//                    )
+//                )
             }
             .padding(.horizontal, 24)
             .padding(.top, 24)

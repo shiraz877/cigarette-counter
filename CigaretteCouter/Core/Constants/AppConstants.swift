@@ -28,5 +28,9 @@ enum AppConstants {
             string: "https://your-domain.com/support"
         )!
     }
+    enum Support {
+           static let email = "support@orbitexlabs.com"
+           static let subject = "Puff Counter Support"
+       }
 
 }

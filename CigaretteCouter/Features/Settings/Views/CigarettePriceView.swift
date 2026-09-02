@@ -119,6 +119,30 @@ struct CigarettePriceView: View {
             for: .navigationBar
         )
         .preferredColorScheme(.dark)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+//                            .background(
+//                                Circle()
+//                                    .fill(.white)
+//                            )
+//                            .shadow(
+//                                color: .black.opacity(0.2),
+//                                radius: 4,
+//                                y: 2
+//                            )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close")
+            }
+        }
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 
     // MARK: - Save

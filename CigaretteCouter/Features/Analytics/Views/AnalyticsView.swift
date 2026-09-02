@@ -1,21 +1,24 @@
-//
-//  AnalyticsView.swift
-//  CigaretteCouter
-//
-//  Created by Shiraz on 18/08/26.
-//
+////
+////  AnalyticsView.swift
+////  CigaretteCouter
+////
+////  Created by Shiraz on 18/08/26.
+////
 
 import SwiftUI
 import Charts
 
 struct AnalyticsView: View {
+    
     @State private var viewModel = AnalyticsViewModel()
     
     var body: some View {
         ScrollView(showsIndicators: false) {
+            
             VStack(alignment: .leading, spacing: 32) {
                 
-                // MARK: Header
+                // MARK: - Header
+                
                 Text("Your smoking")
                     .font(
                         .system(
@@ -27,35 +30,44 @@ struct AnalyticsView: View {
                     .foregroundStyle(AppColors.primaryColor)
                 
                 summarySection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 weeklyChartSection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 monthlyChartSection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 insightsSection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 timeDistributionSection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 recommendationSection
-                Divider().overlay(AppColors.tertiaryColor)
+                
+                Divider()
+                    .overlay(AppColors.tertiaryColor)
                 
                 Spacer()
                     .frame(height: 80)
             }
             .padding(AppTheme.standardPadding)
-            
         }
         .mainBackgroundColor()
         .task {
             await viewModel.loadAnalytics()
         }
-        
-        
     }
 }
 
@@ -83,7 +95,6 @@ private extension AnalyticsView {
             )
         }
         .padding(.bottom, 16)
-        
     }
 }
 
@@ -96,7 +107,7 @@ private extension AnalyticsView {
         VStack(alignment: .leading, spacing: 16) {
             
             sectionTitle("WEEKLY OVERVIEW")
-    
+            
             Chart(viewModel.weeklyData) { item in
                 
                 BarMark(
@@ -106,16 +117,23 @@ private extension AnalyticsView {
                 .foregroundStyle(
                     AppColors.primaryColor
                 )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 2
-                    )
-                )
+                //                .clipShape(
+                //                    RoundedRectangle(
+                //                        cornerRadius: 2
+                //                    )
+                //                )
             }
+            
+            // MARK: X Axis
+            
             .chartXAxis {
+                
                 AxisMarks { value in
+                    
                     AxisValueLabel {
+                        
                         if let day = value.as(String.self) {
+                            
                             Text(day)
                                 .font(.system(size: 11))
                                 .foregroundStyle(
@@ -125,17 +143,28 @@ private extension AnalyticsView {
                     }
                     
                     AxisGridLine(
-                        stroke: StrokeStyle(lineWidth: 0)
+                        stroke: StrokeStyle(
+                            lineWidth: 0
+                        )
                     )
                     
                     AxisTick(
-                        stroke: StrokeStyle(lineWidth: 0)
+                        stroke: StrokeStyle(
+                            lineWidth: 0
+                        )
                     )
                 }
             }
             
+            // MARK: Y Axis
+            
             .chartYAxis {
-                AxisMarks { _ in
+                
+                AxisMarks(
+                    position: .leading
+                ) { value in
+                    
+                    // Horizontal grid line
                     AxisGridLine(
                         stroke: StrokeStyle(
                             lineWidth: 1,
@@ -145,23 +174,66 @@ private extension AnalyticsView {
                     .foregroundStyle(
                         AppColors.secondaryColor
                     )
+                    
+                    // Small tick beside label
+                    AxisTick()
+                        .foregroundStyle(
+                            AppColors.tertiaryColor
+                        )
+                    
+                    // Numeric value
+                    AxisValueLabel {
+                        
+                        if let value = value.as(Int.self) {
+                            
+                            Text("\(value)")
+                                .font(
+                                    .system(
+                                        size: 11,
+                                        weight: .regular
+                                    )
+                                )
+                                .foregroundStyle(
+                                    AppColors.tertiaryColor
+                                )
+                            
+                        } else if let value = value.as(Double.self) {
+                            
+                            Text(
+                                "\(Int(value.rounded()))"
+                            )
+                            .font(
+                                .system(
+                                    size: 11,
+                                    weight: .regular
+                                )
+                            )
+                            .foregroundStyle(
+                                AppColors.tertiaryColor
+                            )
+                        }
+                    }
                 }
             }
+            
             .chartPlotStyle { plotArea in
+                
                 plotArea
                     .background(.clear)
             }
+            
             .frame(height: 192)
         }
         .padding(.bottom, 16)
-        
     }
 }
 
 // MARK: - Monthly Chart
 
 private extension AnalyticsView {
+    
     var monthlyChartSection: some View {
+        
         VStack(alignment: .leading, spacing: 16) {
             
             sectionTitle("MONTHLY TREND")
@@ -191,20 +263,35 @@ private extension AnalyticsView {
                 )
                 .opacity(0)
             }
+            
+            // MARK: X Axis
+            
             .chartXAxis {
-                AxisMarks(values: [5,15,30]) { value in
+                
+                AxisMarks(
+                    values: [5, 15, 30]
+                ) { value in
+                    
                     AxisGridLine(
-                        stroke: StrokeStyle(lineWidth: 0)
+                        stroke: StrokeStyle(
+                            lineWidth: 0
+                        )
                     )
                     
                     AxisTick(
-                        stroke: StrokeStyle(lineWidth: 0)
+                        stroke: StrokeStyle(
+                            lineWidth: 0
+                        )
                     )
                     
                     AxisValueLabel {
+                        
                         if let day = value.as(Int.self) {
+                            
                             Text("\(day)")
-                                .font(.system(size: 11))
+                                .font(
+                                    .system(size: 11)
+                                )
                                 .foregroundStyle(
                                     AppColors.tertiaryColor
                                 )
@@ -213,10 +300,15 @@ private extension AnalyticsView {
                 }
             }
             
+            // MARK: Y Axis
+            
             .chartYAxis {
                 
-                AxisMarks { _ in
+                AxisMarks(
+                    position: .leading
+                ) { value in
                     
+                    // Horizontal grid line
                     AxisGridLine(
                         stroke: StrokeStyle(
                             lineWidth: 1,
@@ -226,12 +318,57 @@ private extension AnalyticsView {
                     .foregroundStyle(
                         AppColors.secondaryColor
                     )
+                    
+                    // Small tick beside label
+                    AxisTick()
+                        .foregroundStyle(
+                            AppColors.tertiaryColor
+                        )
+                    
+                    // Numeric value
+                    AxisValueLabel {
+                        
+                        if let value = value.as(Int.self) {
+                            
+                            Text("\(value)")
+                                .font(
+                                    .system(
+                                        size: 11,
+                                        weight: .regular
+                                    )
+                                )
+                                .foregroundStyle(
+                                    AppColors.tertiaryColor
+                                )
+                            
+                        } else if let value = value.as(Double.self) {
+                            
+                            Text(
+                                "\(Int(value.rounded()))"
+                            )
+                            .font(
+                                .system(
+                                    size: 11,
+                                    weight: .regular
+                                )
+                            )
+                            .foregroundStyle(
+                                AppColors.tertiaryColor
+                            )
+                        }
+                    }
                 }
             }
+            
+            .chartPlotStyle { plotArea in
+                
+                plotArea
+                    .background(.clear)
+            }
+            
             .frame(height: 192)
         }
         .padding(.bottom, 16)
-        
     }
 }
 
@@ -245,67 +382,72 @@ private extension AnalyticsView {
             
             InsightCard(
                 title: "AVERAGE GAP",
-                value:
-                    viewModel.averageGapText
-                
+                value: viewModel.averageGapText
             )
             
             InsightCard(
                 title: "LONGEST GAP",
-                value:
-                    viewModel.longestGapText
-                
+                value: viewModel.longestGapText
             )
         }
         .padding(.bottom, 16)
-        
     }
 }
 
 // MARK: - Time Distribution
 
 private extension AnalyticsView {
-
+    
     var timeDistributionSection: some View {
+        
         VStack(alignment: .leading, spacing: 16) {
+            
             sectionTitle("TIME DISTRIBUTION")
-
+            
             GeometryReader { geometry in
+                
                 HStack(spacing: 2) {
+                    
                     ForEach(
-                        viewModel.timeDistribution.filter { $0.percentage > 0 }
+                        viewModel.timeDistribution
+                            .filter {
+                                $0.percentage > 0
+                            }
                     ) { item in
-
+                        
                         TimeDistributionItem(
                             title: item.title,
-                            color: AppColors.primaryColor.opacity(
-                                0.2 + item.percentage * 0.8
-                            ),
-                            textColor: item.percentage > 0.5
+                            color: AppColors.primaryColor
+                                .opacity(
+                                    0.2 +
+                                    item.percentage * 0.8
+                                ),
+                            textColor:
+                                item.percentage > 0.5
                             ? AppColors.neutralColor
                             : AppColors.primaryColor
                         )
                         .frame(
-                            width: geometry.size.width * item.percentage
+                            width:
+                                geometry.size.width *
+                            item.percentage
                         )
                     }
                 }
             }
             .frame(height: 48)
-            .clipShape(
-                RoundedRectangle(cornerRadius: 4)
-            )
         }
         .padding(.bottom, 16)
     }
 }
 
-
 // MARK: - Section Title
 
 private extension AnalyticsView {
     
-    func sectionTitle(_ title: LocalizedStringKey) -> some View {
+    func sectionTitle(
+        _ title: LocalizedStringKey
+    ) -> some View {
         
         Text(title)
             .font(
@@ -315,7 +457,9 @@ private extension AnalyticsView {
                 )
             )
             .tracking(1.5)
-            .foregroundStyle(AppColors.tertiaryColor)
+            .foregroundStyle(
+                AppColors.tertiaryColor
+            )
     }
 }
 
@@ -328,7 +472,10 @@ struct AnalyticsStat: View {
     
     var body: some View {
         
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(
+            alignment: .leading,
+            spacing: 4
+        ) {
             
             Text(title)
                 .font(
@@ -353,9 +500,14 @@ struct AnalyticsStat: View {
                     )
                 )
                 .tracking(-2)
-                .foregroundStyle(AppColors.primaryColor)
+                .foregroundStyle(
+                    AppColors.primaryColor
+                )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            alignment: .leading
+        )
     }
 }
 
@@ -368,7 +520,10 @@ struct InsightCard: View {
     
     var body: some View {
         
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(
+            alignment: .leading,
+            spacing: 8
+        ) {
             
             Text(title)
                 .font(
@@ -390,7 +545,9 @@ struct InsightCard: View {
                     )
                 )
                 .tracking(-0.5)
-                .foregroundStyle(AppColors.primaryColor)
+                .foregroundStyle(
+                    AppColors.primaryColor
+                )
         }
         .frame(
             maxWidth: .infinity,
@@ -401,19 +558,19 @@ struct InsightCard: View {
             AppColors.secondaryColor
         )
         .cornerRadius(15)
-        
     }
 }
 
 // MARK: - Time Distribution Item
 
 struct TimeDistributionItem: View {
-
+    
     let title: String
     let color: Color
     let textColor: Color
-
+    
     var body: some View {
+        
         Text(title)
             .font(
                 .system(
@@ -428,50 +585,56 @@ struct TimeDistributionItem: View {
             .background(color)
     }
 }
+
 // MARK: - Recommendations
 
 private extension AnalyticsView {
-
+    
     var recommendationSection: some View {
+        
         VStack(spacing: 16) {
-
-
+            
             AnalyticsMessageCard(
                 icon: "clock",
                 message: frequentTimeMessage
             )
         }
     }
-
+    
     var frequentTimeMessage: LocalizedStringKey {
+        
         guard let hour = viewModel.mostFrequentHour else {
+            
             return "Not enough data yet to identify your most frequent smoking time."
         }
-
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
-
+        
         let calendar = Calendar.current
-
+        
         let date = calendar.date(
             bySettingHour: hour,
             minute: 0,
             second: 0,
             of: Date()
         ) ?? Date()
-
+        
         return "Your most frequent smoking hour is around \(formatter.string(from: date))."
     }
 }
 
-struct AnalyticsMessageCard: View {
+// MARK: - Analytics Message Card
 
+struct AnalyticsMessageCard: View {
+    
     let icon: String
     let message: LocalizedStringKey
-
+    
     var body: some View {
+        
         HStack(spacing: 16) {
-
+            
             Image(systemName: icon)
                 .font(
                     .system(
@@ -479,16 +642,20 @@ struct AnalyticsMessageCard: View {
                         weight: .light
                     )
                 )
-                .foregroundStyle(AppColors.primaryColor)
-
+                .foregroundStyle(
+                    AppColors.primaryColor
+                )
+            
             Text(message)
                 .font(.system(size: 16))
-                .foregroundStyle(AppColors.primaryColor)
+                .foregroundStyle(
+                    AppColors.primaryColor
+                )
                 .fixedSize(
                     horizontal: false,
                     vertical: true
                 )
-
+            
             Spacer(minLength: 0)
         }
         .padding(16)
@@ -498,6 +665,8 @@ struct AnalyticsMessageCard: View {
     }
 }
 
+// MARK: - Duration Formatter
+
 private func formatDuration(
     _ duration: TimeInterval?
 ) -> String {
@@ -506,14 +675,10 @@ private func formatDuration(
         return "--"
     }
     
-    let totalMinutes =
-    Int(duration / 60)
+    let totalMinutes = Int(duration / 60)
     
-    let hours =
-    totalMinutes / 60
-    
-    let minutes =
-    totalMinutes % 60
+    let hours = totalMinutes / 60
+    let minutes = totalMinutes % 60
     
     if hours > 0 {
         return "\(hours)h \(minutes)m"

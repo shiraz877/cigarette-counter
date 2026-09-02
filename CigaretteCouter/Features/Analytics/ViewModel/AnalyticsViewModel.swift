@@ -567,4 +567,5 @@ final class AnalyticsViewModel {
 
         recommendations = result
     }
+ 
 }
