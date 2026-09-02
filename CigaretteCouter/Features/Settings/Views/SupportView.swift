@@ -6,7 +6,9 @@
 //
 
 
+//import SwiftUI
 import SwiftUI
+import UIKit
 
 struct SupportView: View {
 
@@ -122,47 +124,7 @@ struct SupportView: View {
             .mainBackgroundColor()
             .navigationTitle("Support")
             .navigationBarTitleDisplayMode(.inline)
-//            .toolbar {
-//                ToolbarItem(placement: .topBarTrailing) {
-//                  
-//                    Button("Cancel") {
-//                        dismiss()
-//                    }
-//                    .foregroundStyle(AppColors.neutralColor)
-//                }
-//            }
-//            .toolbar {
-//                ToolbarItem(placement: .topBarTrailing) {
-//                    Button {
-//                        dismiss()
-//                    } label: {
-//                        Image(systemName: "xmark")
-//                            .font(.system(size: 14, weight: .semibold))
-//                            .foregroundStyle(AppColors.neutralColor)
-//                            .frame(width: 32, height: 32)
-//                            .background(
-//                                Circle()
-//                                    .fill(Color.white.opacity(0.08))
-//                            )
-//                    }
-//                    .buttonStyle(.plain)
-//                    .accessibilityLabel("Close")
-//                }
-//            }
-//            .toolbar {
-//                ToolbarItem(placement: .topBarTrailing) {
-//                    Button {
-//                        dismiss()
-//                    } label: {
-//                        Image(systemName: "xmark")
-//                            .font(.system(size: 16, weight: .medium))
-//                            .foregroundStyle(AppColors.neutralColor)
-//
-//                    }
-//                    .buttonStyle(.plain)
-//                    .accessibilityLabel("Close")
-//                }
-//            }
+
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -172,15 +134,7 @@ struct SupportView: View {
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(width: 32, height: 32)
-//                            .background(
-//                                Circle()
-//                                    .fill(.white)
-//                            )
-//                            .shadow(
-//                                color: .black.opacity(0.2),
-//                                radius: 4,
-//                                y: 2
-//                            )
+
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Close")
@@ -197,39 +151,58 @@ struct SupportView: View {
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    // MARK: - Send Email
 
     private func sendSupportEmail() {
+        let cleanSubject = subject.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let cleanSubject = subject.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
+       
 
-        let cleanMessage = message.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        )
-
-        var components = URLComponents()
-
-        components.scheme = "mailto"
-        components.path = supportEmail
-        components.queryItems = [
-            URLQueryItem(
-                name: "subject",
-                value: cleanSubject
-            ),
-            URLQueryItem(
-                name: "body",
-                value: cleanMessage
-            )
+        // Gmail URL
+        var gmailComponents = URLComponents()
+        gmailComponents.scheme = "googlegmail"
+        gmailComponents.host = "co"
+        gmailComponents.queryItems = [
+            URLQueryItem(name: "to", value: supportEmail),
+            URLQueryItem(name: "subject", value: cleanSubject),
+            URLQueryItem(name: "body", value: cleanMessage)
         ]
 
-        guard let url = components.url else {
+        guard let gmailURL = gmailComponents.url else {
+          
             return
         }
 
-        openURL(url)
+       
 
+        let canOpenGmail = UIApplication.shared.canOpenURL(gmailURL)
+
+      
+
+        if canOpenGmail {
+          
+            openURL(gmailURL)
+            dismiss()
+            return
+        }
+
+        // Mail fallback
+        var mailComponents = URLComponents()
+        mailComponents.scheme = "mailto"
+        mailComponents.path = supportEmail
+        mailComponents.queryItems = [
+            URLQueryItem(name: "subject", value: cleanSubject),
+            URLQueryItem(name: "body", value: cleanMessage)
+        ]
+
+        guard let mailURL = mailComponents.url else {
+           
+            return
+        }
+
+       
+
+        openURL(mailURL)
         dismiss()
     }
 }
