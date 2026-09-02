@@ -1,103 +1,10 @@
-//////
-//////  LanguageSettingsView.swift
-//////  CigaretteCouter
-//////
-//////  Created by Shiraz on 29/08/26.
-//////
-////
-////import SwiftUI
-////
-////struct LanguageSettingsView: View {
-////
-////    @Environment(AppViewModel.self)
-////    private var appViewModel
-////
-////    var body: some View {
-////        List {
-////
-////            Section {
-////
-////                Picker(
-////                    "settings.language",
-////                    selection: Binding(
-////                        get: {
-////                            appViewModel.selectedLanguage
-////                        },
-////                        set: { language in
-////                            appViewModel.setLanguage(language)
-////                        }
-////                    )
-////                ) {
-////                    ForEach(AppLanguage.allCases) { language in
-////                        Text(language.displayName)
-////                            .tag(language)
-////                            .foregroundStyle(.white)
-////                    }
-////                }
-////                .foregroundStyle(.white)
-////
-////            } header: {
-////                Text("settings.language")
-////                    .foregroundStyle(AppColors.primaryColor)
-////            }
-////        }
-////        .navigationTitle("settings.language")
-////        .background(Color.black)
-////        .foregroundStyle(.white)
-////    }
-////}
 //
-//import SwiftUI
+//  LanguageSettingsView.swift
+//  CigaretteCouter
 //
-//struct LanguageSettingsView: View {
+//  Created by Shiraz on 29/08/26.
 //
-//    @Environment(AppViewModel.self)
-//    private var appViewModel
-//
-//    var body: some View {
-//        List {
-//            Section {
-//                Picker(
-//                    "settings.language",
-//                    selection: Binding(
-//                        get: {
-//                            appViewModel.selectedLanguage
-//                        },
-//                        set: { language in
-//                            appViewModel.setLanguage(language)
-//                        }
-//                    )
-//                ) {
-//                    ForEach(AppLanguage.allCases) { language in
-//                        Text(language.displayName)
-//                            .foregroundStyle(.white)
-//                            .tag(language)
-//                    }
-//                }
-//                .foregroundStyle(.black)
-//
-//            } header: {
-//                Text("settings.language")
-//                    .foregroundStyle(AppColors.primaryColor)
-//            }
-//        }
-//        // Remove the default List background
-//        .scrollContentBackground(.hidden)
-//
-//        // Make the entire sheet black
-//        .background(Color.black)
-//
-//        // Make List text white
-//        .foregroundStyle(.white)
-//
-//        .navigationTitle("settings.language")
-//        .navigationBarTitleDisplayMode(.inline)
-//
-//        // Make navigation bar dark
-//        .toolbarColorScheme(.dark, for: .navigationBar)
-//    }
-//}
-//
+
 
 import SwiftUI
 

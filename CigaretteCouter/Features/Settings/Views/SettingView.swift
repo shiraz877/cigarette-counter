@@ -250,13 +250,7 @@ struct SettingsView: View {
             .toolbarColorScheme(.dark, for: .navigationBar)
             
         }
-//        .sheet(isPresented: $showRateApp) {
-//            RateAppView()
-//                .presentationDetents([.medium, .large])
-//                .presentationDragIndicator(.visible)
-//                .presentationBackground(.black)
-//                .toolbarColorScheme(.dark, for: .navigationBar)
-//        }
+
         .overlay {
             if showRateAppDialog {
                 RateAppDialog(

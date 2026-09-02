@@ -53,7 +53,7 @@ struct MainTabView: View {
                 }
             }
             .tint(AppColors.neutralColor)
-//            .tint(.red)
+
         }
         .mainBackgroundColor()
         .sheet(isPresented: $showAccountSheet) {
@@ -93,7 +93,4 @@ struct MainTabView: View {
     }
 }
 
-//#Preview {
-//    MainTabView()
-//        .environment(AppViewModel())
-//}
+

@@ -230,13 +230,7 @@ struct AccountView: View {
                             Color.white.opacity(0.08)
                         )
                     
-//                    accountRow(
-//                        icon: "arrow.clockwise",
-//                        title: "Sync Data"
-//                    ) {
-//                        
-//                        print("Sync Data")
-//                    }
+
                     
                     Divider()
                         .overlay(
@@ -254,14 +248,10 @@ struct AccountView: View {
                     }
                 }
                 .background(
-//                    Color.white.opacity(0.05)
+
                     AppColors.secondaryColor
                 )
-//                .clipShape(
-//                    RoundedRectangle(
-//                        cornerRadius: 16
-//                    )
-//                )
+
             }
             .padding(.horizontal, 24)
             .padding(.top, 24)
